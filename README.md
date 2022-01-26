@@ -19,6 +19,28 @@ We will be primarily working with Fetal Health data set acquired from Kaggle [1]
 We started our analysis with a multinomial logistic regression which is followed by a binomial logistic regression for each class. During exploratory analysis, we removed certain predictors with high correlations to avoid multicollinearity in our fitted model. After fitting an initial full model we checked for outliers and multicollinearity in the model. We performed variable selection by using stepwise regression, elastic net regression and lasso regression. Then we evaluated the effect of changing the probability threshold based on the model performance as per different metrics. After choosing models based on the criteria suitable for the class of each response variable, we used all three models to make predictions on a new set of observations. Our models can be used by medical professionals to assess a fetus’s health and perform corrective measures to ensure the fetus’s wellbeing. This can in turn help health care professionals to prevent child or maternal mortality.
 One of the major challenges in this data set is that the class of response variables were not evenly distributed. Most observations belonged to the “Normal Fetus”. Having a data set with equal number of classes can help to better recognise the pathological cases, which were heavily outnumbered in this data set. Secondly, in actual conditions, the interpretation of fetus’s CTC varies with respect to the baby’s trimester and labor’s stage. If multiple data sets can be collected for different set of these features, then different models can be fitted to assess a fetus’s health based on its trimester and labor.
 
+## Exploratory Data Analysis
+![image](https://user-images.githubusercontent.com/70823162/151109275-dfbf94a2-4df3-4eac-a9ba-0a355c4509ec.png)
+![image](https://user-images.githubusercontent.com/70823162/151109302-676c82b4-b248-4d80-afa1-5f803ff90911.png)
+
+## Model Fitting
+![image](https://user-images.githubusercontent.com/70823162/151109390-8fe1dada-5199-454f-b5a4-389aa847e31e.png)
+
+## Model Evaluation
+![image](https://user-images.githubusercontent.com/70823162/151109404-e82a0830-535e-43b0-bbe6-5292da819d69.png)
+
+## Model Selection
+![image](https://user-images.githubusercontent.com/70823162/151109423-de5677b0-e633-4812-9067-cfeb5171b523.png)
+![image](https://user-images.githubusercontent.com/70823162/151109435-a5093220-1f3b-414d-aa29-0b71f79750b2.png)
+![image](https://user-images.githubusercontent.com/70823162/151109469-5234972e-4369-4658-a11e-4e46a5f9de9f.png)
+![image](https://user-images.githubusercontent.com/70823162/151109483-f1166404-bba6-4462-9152-b13eee5ecf32.png)
+
+## Model Deployment
+![image](https://user-images.githubusercontent.com/70823162/151109514-96ef177c-8118-4cb8-a833-d953c6b19405.png)
+![image](https://user-images.githubusercontent.com/70823162/151109522-957d382c-8647-44f5-ad7e-2e485c5f19e0.png)
+
+
+
 ## Code Execution
 
 **Main Instructions**
