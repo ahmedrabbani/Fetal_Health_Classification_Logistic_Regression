@@ -1,0 +1,7 @@
+Index,Fetal_Health,0.3 Normal,0.5 Normal,0.7 Normal,0.3 Suspect,0.5 Suspect,0.7 Suspect,0.3 Pathological,0.5 Pathological,0.7 Pathological
+138,Not Normal,Normal,Not Normal,Not Normal,Suspect,Suspect,Not Suspect,Not Pathological,Not Pathological,Not Pathological
+257,Normal,Normal,Normal,Normal,Not Suspect,Not Suspect,Not Suspect,Not Pathological,Not Pathological,Not Pathological
+398,Not Normal,Not Normal,Not Normal,Not Normal,Suspect,Suspect,Suspect,Not Pathological,Not Pathological,Not Pathological
+516,Normal,Normal,Normal,Normal,Not Suspect,Not Suspect,Not Suspect,Not Pathological,Not Pathological,Not Pathological
+751,Not Normal,Not Normal,Not Normal,Not Normal,Suspect,Suspect,Not Suspect,Pathological,Pathological,Pathological
+1490,Not Normal,Not Normal,Not Normal,Not Normal,Not Suspect,Not Suspect,Not Suspect,Not Pathological,Not Pathological,Not Pathological
