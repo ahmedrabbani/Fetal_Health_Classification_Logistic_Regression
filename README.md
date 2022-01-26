@@ -1,5 +1,9 @@
 # Fetal_Health_Classification_Logistic_Regression
 
+## Note:
+This repository is for personal back-up purpose. Download, copy or use of any code will be considered a violation of Georgia Tech's Honor Code.
+
+
 ## Problem Statement
 
 Cardiotocograph exams (CTG) measure changes in the fetal heart rate and draw conditional relationships with uterine contractions. The objective of these exams is to assess the fetus health by monitoring fetal heart rate (FHR), fetal movements, uterine contractions, and numerous other related factors. Results from these exams enable health care professionals to perform additional assessments to ensure fetus’s wellbeing and determine if the baby needs to be delivered by caesarean section or instrumental vaginal birth.
