@@ -1,0 +1,406 @@
+---
+title: "ISYE 6414 Regression Analysis Project - Group 10 "
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Background
+
+We will be primarily working with Fetal Health data set acquired from Kaggle. The data set includes 2126 training examples and 21 predictors. This data set was collected by examining features of 2126 cardiotocograph exams. The results of these exams were then classified by three expert obstetricians into three categories, briefly explained below:
+
+  • Normal: Features UNLIKELY to be associated with fetal compromise. No further action required.
+  • Suspect: Features MAY be associated with fetal compromise. Requires further action.
+  • Pathological: Features are LIKELY to be associated with fetal compromise. Immediate action             required.
+  
+# Data Description
+
+The data consists of the following variables:
+
+1. **baseline.value**: Baseline Fetal Heart Rate (FHR)
+2. **accelerations**: Number of accelerations per second
+3. **fetal_movement**: Number of fetal movements per second
+4. **uterine_contractions**: Number of uterine contractions per second
+5. **light_decelerations**: Number of LDs per second
+6. **severe_decelerations**: Number of SDs per second
+7. **prolongued_decelerations**: Number of PDs per second
+8. **abnormal_short_term_variability**: Percentage of time with abnormal short term variability
+9. **mean_value_of_short_term_variability**: Mean value of short term variability
+10. **percentage_of_time_with_abnormal_long_term_variability**: Percentage of time with abnormal long term variability
+11. **mean_value_of_long_term_variability**:Mean value of long term variability
+12. **histogram.width**: Width of the histogram made using all values from a record
+13. **histogram.min**: Histogram minimum value
+14. **histogram.max**: Histogram maximum value
+15. **histogram_number_of_peaks**: Number of peaks in the exam histogram
+16. **histogram_number_of_zeroes**: Number of zeroes in the exam histogram
+17. **histogram_mode**: Histogram Mode
+18. **histogram_mean**: Histogram Mean
+19. **histogram_median**: Histogram Median
+20. **histogram_variance**: Histogram Variance
+21. **histogram_tendency**: Histogram Trend
+22. **fetal.health**: Fetal health: 1 - Normal 2 - Suspect 3 - Pathological
+
+
+## Reading the data
+
+
+
+```{r}
+library(tidyverse)
+library(caret)
+library(stringr)
+library(MASS)
+library(msm)
+library(caret)
+library(broom)
+library(DT)
+library(glmnet)
+```
+
+
+```{r}
+
+Data = read.csv("Suspect.csv", header=TRUE)
+row.cnt = nrow(Data)
+Data$Fetal.Health<-as.factor(Data$Fetal.Health)
+set.seed(3456)
+trainIndex = createDataPartition(Data$Fetal.Health, p = .7,
+                                  list = FALSE,
+                                  times = 1)
+Train = Data[ trainIndex,]
+Test = Data[-trainIndex,]
+attach(Train)
+head(Train)
+write.csv(Test,"Test_Suspect.csv")
+
+```
+## Exploratory Data Analysis
+
+# Boxplots For Each Predictors Against Response
+
+```{r}
+features <- setdiff(colnames(Train),'Fetal.Health')
+
+png(file="11 - Boxplot_Suspect.png", res=300, width=1500, height=1500)
+par(mfrow=c(1,3))
+for (f in features[1:3]) {
+    boxplot(Train[,f]~Fetal.Health, data=Train,xlab="Fetal Health", ylab=str_to_title(f),main = "", col=(c("orange","red")), pch = 16,lwd = 1,lty = 1)
+}
+dev.off()
+
+png(file="12 - Boxplot_Suspect.png", res=300, width=1500, height=1500)
+par(mfrow=c(1,3))
+for (f in features[4:6]) {
+    boxplot(Train[,f]~Fetal.Health, data=Train,xlab="Fetal Health", ylab=str_to_title(f),main = "", col=(c("orange","red")), pch = 16,lwd = 1,lty = 1)
+
+}
+dev.off()
+
+png(file="13 - Boxplot_Suspect.png", res=300, width=1500, height=1500)
+par(mfrow=c(1,3))
+for (f in features[7:9]) {
+    boxplot(Train[,f]~Fetal.Health, data=Train,xlab="Fetal Health", ylab=str_to_title(f),main = "", col=(c("orange","red")), pch = 16,lwd = 1,lty = 1)
+
+}
+dev.off()
+
+png(file="14 - Boxplot_Suspect.png", res=300, width=1500, height=1500)
+par(mfrow=c(1,3))
+for (f in features[10:12]) {
+    boxplot(Train[,f]~Fetal.Health, data=Train,xlab="Fetal Health", ylab=str_to_title(f),main = "", col=(c("orange","red")), pch = 16,lwd = 1,lty = 1)
+
+}
+dev.off()
+
+
+png(file="15 - Boxplot_Suspect.png", res=300, width=1500, height=1500)
+par(mfrow=c(2,2))
+for (f in features[13:16]) {
+    boxplot(Train[,f]~Fetal.Health, data=Train,xlab="Fetal Health", ylab=str_to_title(f),main = "", col=(c("orange","red")), pch = 16,lwd = 1,lty = 1)
+
+}
+dev.off()
+
+```
+
+
+```{r}
+
+# Histogram For Each Variable
+
+features <- setdiff(colnames(Train),'Fetal.Health')
+
+png(file="16 - Histogram_Suspect.png", res=300, width=1500, height=1500)
+par(mfrow=c(1,3))
+for (f in features[1:3]) {
+    hist(Train[,f],ylab="Frequency", xlab=str_to_title(f),main = "", col='orange', pch = 16,lwd = 2, lty =1)
+
+}
+dev.off()
+
+png(file="17 - Histogram_Suspect.png", res=300, width=1500, height=1500)
+par(mfrow=c(1,3))
+for (f in features[4:6]) {
+    hist(Train[,f],ylab="Frequency", xlab=str_to_title(f),main = "", col='orange', pch = 16,lwd = 2, lty =1)
+
+}
+dev.off()
+
+png(file="18 - Histogram_Suspect.png", res=300, width=1500, height=1500)
+par(mfrow=c(1,3))
+for (f in features[7:9]) {
+    hist(Train[,f],ylab="Frequency", xlab=str_to_title(f),main = "", col='orange', pch = 16,lwd = 2, lty =1)
+
+}
+dev.off()
+
+png(file="19 - Histogram_Suspect.png", res=300, width=1500, height=1500)
+par(mfrow=c(1,3))
+for (f in features[10:12]) {
+    hist(Train[,f],ylab="Frequency", xlab=str_to_title(f),main = "", col='orange', pch = 16,lwd = 2, lty =1)
+
+}
+dev.off()
+
+png(file="20 - Histogram_Suspect.png", res=300, width=1500, height=1500)
+par(mfrow=c(2,2))
+for (f in features[13:16]) {
+    hist(Train[,f],ylab="Frequency", xlab=str_to_title(f),main = "", col='orange', pch = 16,lwd = 2, lty =1)
+
+}
+dev.off()
+
+```
+
+## Fitting a Model
+
+# Model Fitting
+
+```{r}
+# Train$histogram_tendency<-as.factor(Train$histogram_tendency)
+# Test$histogram_tendency<-as.factor(Test$histogram_tendency)
+model1 =glm(Fetal.Health ~ ., data=Train, family='binomial')
+results_model1 <-summary.glm(model1)$coefficients
+datatable(results_model1)
+write.csv(results_model1,"21_Summary_Full_Model_Suspect.csv")
+```
+
+# Equation For Odds
+
+
+# Interpretation of Coefficients - Numerical
+
+# Interpretation of Coefficients - Categorical
+
+## Statistical Inference
+
+# Testing For Subset of Coefficients
+```{r}
+
+datatable(anova(model1, test="Chisq"))
+write.csv(anova(model1, test="Chisq"),"22_Anova_Suspect.csv")
+```
+
+
+# Testing For Overall Significance
+
+```{r}
+1-pchisq((model1$null.dev - model1$deviance),(model1$df.null - model1$df.resid))
+```
+
+
+
+# Checking For Outliers
+```{r}
+png(file="23 - Outlier_Full_Model_Suspect.png", res=300, width=2000, height=2000)
+plot(model1, which = 4, id.n = 3,lwd=5, col="orange")
+dev.off()
+```
+
+```{r}
+
+model1.data <- augment(model1) %>% 
+  mutate(index = 1:n()) 
+
+png(file="24 - Std_Resids_Full_Model_Suspect.png", res=300, width=2000, height=2000)
+ggplot(model1.data, aes(index, .std.resid)) + 
+  geom_point(aes(colour = Fetal.Health), alpha = 0.5) +
+  theme_bw() + labs(x = "Observation Index") + labs(y = "Standard Residuals") +labs(color = "Fetal Health")
+dev.off()
+```
+
+# Checking For Multi Collniearity
+
+```{r}
+library(car)
+vif(model1)
+write.csv(vif(model1),"25 - Multi_Coll_Full_Model_Suspect.csv")
+```
+
+## Model Selection
+
+# 1.Forward-Backward Stepwise Regression
+
+```{r, results='asis'}
+# Create minimum model including an intercept
+min.model <-  glm(Fetal.Health~ 1, family = "binomial", data = Train)
+
+# Perform stepwise regression
+step.model <- step(min.model, scope = list(lower = min.model, upper = model1),
+                  direction = "both", trace = FALSE)
+summary(step.model)
+which(summary(step.model)$coeff[,4]>0.05)
+
+results_model1 <-summary.glm(step.model)$coefficients
+write.csv(results_model1,"26 - FB_Stepwise_Suspect.csv")
+```
+
+# 2. Lasso Regression
+
+```{r}
+# Set a seed for reproducibility
+set.seed(1)
+
+# Set predictors and response to correct format
+x.train <- model.matrix(Fetal.Health ~ ., Train)[,-1]
+y.train <- Train$Fetal.Health
+
+# Use cross validation to find optimal lambda
+cv.lasso <- cv.glmnet(x.train, y.train, alpha = 1, family = "binomial")
+
+# Train Lasso and display coefficients with optimal lambda
+lasso.model <- glmnet(x.train, y.train, alpha = 1, family = "binomial")
+coef(lasso.model, cv.lasso$lambda.min)
+a = coef(lasso.model, cv.lasso$lambda.min)
+df <- as.data.frame(as.matrix(a))
+write.csv(df,"27 - Lasso_Suspect.csv")
+
+```
+# 3. Elastic Net Regression
+
+```{r}
+# Set a seed for reproducibility
+set.seed(1)
+
+# Use cross validation to find optimal lambda
+cv.elnet <- cv.glmnet(x.train, y.train, alpha = 0.5, family = "binomial")
+
+# Train Elastic Net and display coefficients with optimal lambda
+elnet.model <- glmnet(x.train, y.train, alpha = 0.5, family = "binomial")
+coef(elnet.model, cv.elnet$lambda.min)
+a = coef(elnet.model, cv.elnet$lambda.min)
+df <- as.data.frame(as.matrix(a))
+write.csv(df,"28 - Elastic_Net_Suspect.csv")
+```
+
+
+
+
+4. Variable Selection Comparison
+
+```{r}
+# Identify variables not selected by F-B Stepwise regression
+index.step <- which(!(names(coef(model1)) %in% names(coef(step.model))))
+cat("\n Variables not selected by forward-backward stepwise:",
+    names(coef(model1)[index.step]))
+
+# Identify variables not selected by Lasso
+index.lasso <- which(coef(lasso.model, cv.lasso$lambda.min) == 0)
+cat("\n Variables not selected by lasso regression: ",
+    names(coef(model1)[index.lasso]))
+
+# Identify variables not selected by Elastic Net
+index.elnet <- which(coef(elnet.model, cv.elnet$lambda.min) == 0)
+cat("\n Variables not selected by elastic net regression:",
+    names(coef(model1)[index.elnet]))
+```
+
+
+## Prediction
+```{r}
+# 1. Prediction for the full model
+
+full.model = model1
+test = Test
+# Obtain predicted probabilities for the test set
+pred.full = predict(full.model, newdata = test, type = "response")
+# Obtain classifications using a classification threshold of 0.5
+predClass.full = ifelse(pred.full > 0.7, 1, 0)
+
+# 2. Prediction for the stepwise regression 
+
+# Obtain predicted probabilities for the test set
+pred.step = predict(step.model, newdata = test, type = "response")
+# Obtain classifications using a classification threshold of 0.5
+predClass.step = ifelse(pred.step > 0.7, 1, 0)
+
+# 3. Prediction for the lasso regression
+
+# Retrain OLS model using Lasso-selected predictors
+lasso.predictors <- as.data.frame(x.train)[-(index.lasso-1)]
+lasso.retrained <- glm(y.train ~ . , family = "binomial", data = lasso.predictors)
+# Set test data to correct format
+new_test <- model.matrix( ~ ., test)[,-1]
+# Obtain predicted probabilities for the test set
+pred.lasso = predict(lasso.retrained, newdata = as.data.frame(new_test),
+                     type = "response")
+# Obtain classifications using a classification threshold of 0.5
+predClass.lasso = ifelse(pred.lasso > 0.7, 1, 0)
+
+# 4. Prediction for elastic net regression 
+
+# Set predictors to correct format
+x.test <- model.matrix(Fetal.Health ~ ., test)[,-1]
+# Obtain predicted probabilities for the test set
+pred.elnet = as.vector(predict(elnet.model, newx = x.test,
+                               type = "response", s = cv.elnet$lambda.min))
+# Obtain classifications using a classification threshold of 0.5
+predClass.elnet = ifelse(pred.elnet > 0.7, 1, 0)
+
+# Create a data frame with the predictions
+preds = data.frame(Fetal_Health = Test$Fetal.Health, predClass.full,
+                   predClass.step, predClass.lasso, predClass.elnet)
+preds
+write.csv(preds,"29 - Prediction_0.7_Suspect.csv")
+```
+
+```{r}
+# Build a confusion table and calculate metrics
+
+
+pred_metrics = function(modelName, actualClass, predClass) {
+  cat(modelName, '\n')
+  conmat <- confusionMatrix(table(actualClass, predClass))
+  c(conmat$overall["Accuracy"], conmat$byClass["Sensitivity"],
+    conmat$byClass["Specificity"])
+}
+
+pred_metrics("Full Model",Test$Fetal.Health, predClass.full)
+a = pred_metrics("Full Model",Test$Fetal.Health, predClass.full)
+write.csv(a,"30 - PM_Full_Model_0.7_Suspect.csv")
+
+pred_metrics("Stepwise Regression Model",Test$Fetal.Health, predClass.step)
+a = pred_metrics("Stepwise Regression Model",Test$Fetal.Health, predClass.step)
+write.csv(a,"31 - PM_Stepwise_Model_0.7_Suspect.csv")
+
+pred_metrics("Lasso Regression Model",Test$Fetal.Health, predClass.lasso)
+a = pred_metrics("Lasso Regression Model",Test$Fetal.Health, predClass.lasso)
+write.csv(a,"32 - PM_Lasso_Model_0.7_Suspect.csv")
+
+
+pred_metrics("Elastic Regression Model",Test$Fetal.Health, predClass.elnet)
+a = pred_metrics("Elastic Regression Model",Test$Fetal.Health, predClass.elnet)
+write.csv(a,"33 - PM_Elastic_Model_0.7_Suspect.csv")
+```
+
+
+```{r}
+asdasd
+```
+
